@@ -14,7 +14,6 @@ def plot_func(x, y):
 def main():
     print(f"Hello, My Reservoir Network!!")
     inputs = InputGenerator(T, dt).generate_sin()
-    print(f"inputs: {inputs}")
     rn = ReservoirNetWork(np.arange(10), 5, 5, 1)
     rn.print_weights()
     plot_func(np.arange(int(T/dt)), inputs)
