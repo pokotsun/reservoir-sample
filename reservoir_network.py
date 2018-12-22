@@ -1,11 +1,12 @@
 import numpy as np
 from scipy import linalg
+
 class ReservoirNetWork:
 
     def __init__(self, inputs, num_input_nodes, num_reservoir_nodes, num_output_nodes, leak_rate=0.1, activator=np.tanh):
         self.inputs = inputs
         self.reservoir_nodes = np.random.uniform(0, 1, num_reservoir_nodes)
-        self.outputs = np.zeros(num_output_nodes)
+        self.outputs = np.array([])
 
         self.weights_input = self._generate_variational_weights(num_input_nodes, num_reservoir_nodes)
         self.weights_reservoir = self._generate_reservoir_weights(num_reservoir_nodes)
@@ -18,6 +19,9 @@ class ReservoirNetWork:
 
         self.leak_rate = leak_rate
         self.activator = activator
+
+        # log
+        # self.log_outputs = np.array([])
 
     # create weights which variated by -0.1 or +0.1
     def _generate_variational_weights(self, num_pre_nodes, num_post_nodes):
@@ -43,14 +47,17 @@ class ReservoirNetWork:
             
             # Ridge Regression
             E_lambda0 = np.identity(self.num_reservoir_nodes) * lambda0 # lambda0
-            # print(f"x @ x.T: {current_x.T @ current_x}")
             inv_x = np.linalg.inv(current_x.T @ current_x + E_lambda0)
-            # print(f"inv_x: {inv_x}")
             self.weights_output = (inv_x @ current_x.T).reshape([self.num_reservoir_nodes, self.num_output_nodes]) @ np.array([input])
-            # print(f"weights_output: {self.weights_output}")
-            self.outputs = self.activator(current_x @ self.weights_output)
-            print(f"output, input: {self.outputs}, {input}")
-            print(f"RMSE: {np.sqrt((self.outputs - np.array(input))**2)}")
+
+            # get trained output
+            output = self.activator(current_x @ self.weights_output)
+            self.outputs = np.append(self.outputs, output)
+        return self.outputs
+    
+    def minimum_square_error(self):
+        return np.sqrt(np.sum((self.outputs - self.inputs) ** 2)) / len(self.inputs)
+        
 
 
 

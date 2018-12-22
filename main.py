@@ -15,10 +15,11 @@ def main():
     print(f"Hello, My Reservoir Network!!")
     inputs = InputGenerator(T, dt).generate_sin()
     rn = ReservoirNetWork(inputs=inputs, num_input_nodes=1, num_reservoir_nodes=10, num_output_nodes=1)
-    rn.print_weights()
+    # rn.print_weights()
     rn.train()
     # rn.print_weights()
     # plot_func(np.arange(int(T/dt)), inputs)
+    print(f"MINIMUM_SQUARE_ERROR: {rn.minimum_square_error()}")
     
 
 if __name__=="__main__":
