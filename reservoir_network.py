@@ -10,6 +10,7 @@ class ReservoirNetWork:
         self.weights_reservoir = self._generate_reservoir_weights(num_reservoir_nodes)
         self.weights_output = np.zeros([num_reservoir_nodes, num_output_nodes])
         self.num_nodes_reservoir = num_reservoir_nodes
+        self.num_output_nodes = num_output_nodes
         self.leak_rate = leak_rate
         self.activator = activator
 
@@ -32,14 +33,14 @@ class ReservoirNetWork:
             current_x = (1 - self.leak_rate) * self.nodes_reservoir
             current_x += self.leak_rate * (np.array([input]) @ self.weights_input
              + self.nodes_reservoir @ self.weights_reservoir)
+            current_x = self.activator(current_x)
             
-            print(f"current_x: {current_x}")
-
             # Ridge Regression
             E_lambda0 = np.identity(self.num_nodes_reservoir) * lambda0 # lambda0
+            print(f"x @ x.T: {current_x.T @ current_x}")
             inv_x = np.linalg.inv(current_x.T @ current_x + E_lambda0)
             print(f"inv_x: {inv_x}")
-            self.weights_output = inv_x @ self.weights_output
+            self.weights_output = (inv_x @ current_x.T).reshape([self.num_nodes_reservoir, self.num_output_nodes]) @ np.array([input])
             print(f"weights_output: {self.weights_output}")
 
 
