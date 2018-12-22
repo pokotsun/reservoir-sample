@@ -1,16 +1,23 @@
 import numpy as np
 from input_generator import InputGenerator
 from reservoir_network import ReservoirNetWork
+import matplotlib.pyplot as plt
+
+T = 10
+dt = 0.5
+
+def plot_func(x, y):
+    plt.plot(x, y)
+    plt.show()
 
 
-NUM_TIME_STEPS = 10
-TIME_STEP = 0.5
 def main():
     print(f"Hello, My Reservoir Network!!")
-    inputs = InputGenerator(NUM_TIME_STEPS, TIME_STEP).generate_sin()
+    inputs = InputGenerator(T, dt).generate_sin()
     print(f"inputs: {inputs}")
     rn = ReservoirNetWork(np.arange(10), 5, 5, 1)
-    print(rn.print_weights())
+    rn.print_weights()
+    plot_func(np.arange(int(T/dt)), inputs)
 
 if __name__=="__main__":
     main()

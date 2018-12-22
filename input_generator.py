@@ -2,12 +2,12 @@ import numpy as np
 
 class InputGenerator:
 
-    def __init__(self, num_time_steps, dt):
-        self.num_time_steps = num_time_steps
+    def __init__(self, total_time, dt):
+        self.T = total_time
         self.dt = dt
-        self.total_time = int(num_time_steps * dt)
+        self.num_time_steps = int(total_time/dt)
     
     def generate_sin(self, amplitude=1.0):
-        return np.sin(np.arange(0, self.total_time, self.dt)) * amplitude
+        return np.sin(np.arange(0, self.T, self.dt)) * amplitude
     
 

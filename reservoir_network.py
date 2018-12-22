@@ -20,9 +20,9 @@ class ReservoirNetWork:
         return weights
 
     def print_weights(self):
-        print(f"weights_input: {self.weights_input}")
-        print(f"weights_reservoir: {self.weights_reservoir}")
-        print(f"weights_output: {self.weights_output}")
+        print(f"weights_input:\n{self.weights_input}\n")
+        print(f"weights_reservoir:\n{self.weights_reservoir}\n")
+        print(f"weights_output:\n{self.weights_output}\n")
 
     def fit(self):
         for input in self.inputs:
