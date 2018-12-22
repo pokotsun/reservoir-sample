@@ -12,7 +12,7 @@ class ReservoirNetWork:
         self.weights_reservoir = self._generate_reservoir_weights(num_reservoir_nodes)
         self.weights_output = np.zeros([num_reservoir_nodes, num_output_nodes])
         
-        # 
+        # number of each layer nodes
         self.num_input_nodes = num_input_nodes
         self.num_reservoir_nodes = num_reservoir_nodes
         self.num_output_nodes = num_output_nodes
@@ -20,14 +20,11 @@ class ReservoirNetWork:
         self.leak_rate = leak_rate
         self.activator = activator
 
-        # log
-        # self.log_outputs = np.array([])
-
-    # create weights which variated by -0.1 or +0.1
+    # create weights either -0.1 or +0.1
     def _generate_variational_weights(self, num_pre_nodes, num_post_nodes):
         return (np.random.randint(0, 2, num_pre_nodes * num_post_nodes).reshape([num_pre_nodes, num_post_nodes]) * 2 - 1) * 0.1
     
-    # Reservoir層の重みを作成
+    # create weights of reservoir layer
     def _generate_reservoir_weights(self, num_nodes, scale_weights_reservoir=0.9):
         weights = np.random.normal(0, 1, num_nodes * num_nodes).reshape([num_nodes, num_nodes])
         spectral_radius = max(abs(linalg.eigvals(weights)))
@@ -38,25 +35,48 @@ class ReservoirNetWork:
         print(f"weights_reservoir:\n{self.weights_reservoir}\n")
         print(f"weights_output:\n{self.weights_output}\n")
 
+    def _update_reservoir_nodes(self, input):
+        current_x = (1 - self.leak_rate) * self.reservoir_nodes
+        current_x += self.leak_rate * (np.array([input]) @ self.weights_input
+            + self.reservoir_nodes @ self.weights_reservoir)
+        current_x = self.activator(current_x)
+        self.reservoir_nodes = current_x
+
+    def _update_weights_output(self, input, lambda0=0.1):
+        # Ridge Regression
+        E_lambda0 = np.identity(self.num_reservoir_nodes) * lambda0 # lambda0
+        inv_x = np.linalg.inv(self.reservoir_nodes.T @ self.reservoir_nodes + E_lambda0)
+        # update weights of output layer
+        self.weights_output = (inv_x @ self.reservoir_nodes.T).reshape([self.num_reservoir_nodes, self.num_output_nodes]) @ np.array([input])
+
     def train(self, lambda0=0.1):
         for input in self.inputs:
-            current_x = (1 - self.leak_rate) * self.reservoir_nodes
-            current_x += self.leak_rate * (np.array([input]) @ self.weights_input
-             + self.reservoir_nodes @ self.weights_reservoir)
-            current_x = self.activator(current_x)
-            
-            # Ridge Regression
-            E_lambda0 = np.identity(self.num_reservoir_nodes) * lambda0 # lambda0
-            inv_x = np.linalg.inv(current_x.T @ current_x + E_lambda0)
-            self.weights_output = (inv_x @ current_x.T).reshape([self.num_reservoir_nodes, self.num_output_nodes]) @ np.array([input])
-
+            self._update_reservoir_nodes(input)
+            self._update_weights_output(input, lambda0)
             # get trained output
-            output = self.activator(current_x @ self.weights_output)
+            output = self.get_current_output()
             self.outputs = np.append(self.outputs, output)
+
         return self.outputs
     
-    def minimum_square_error(self):
-        return np.sqrt(np.sum((self.outputs - self.inputs) ** 2)) / len(self.inputs)
+    def predict(self, length_of_sequence, lambda0=0.1):
+        predicted_outputs = np.array([self.inputs[-1]])
+
+        for _ in range(length_of_sequence - 1):
+            last_output = predicted_outputs[-1]
+            self._update_reservoir_nodes(last_output)
+            self._update_weights_output(last_output, lambda0)
+            predicted_output = self.get_current_output()
+            predicted_outputs = np.append(predicted_outputs, predicted_output)
+
+        return predicted_outputs
+
+    # get output of current state
+    def get_current_output(self):
+        return self.activator(self.reservoir_nodes @ self.weights_output)
+    
+    def minimum_square_error(self, trained_data, desired_data):
+        return np.sqrt(np.sum((trained_data - desired_data) ** 2)) / len(trained_data)
         
 
 
