@@ -3,8 +3,8 @@ from scipy import linalg
 
 class ReservoirNetWork:
 
-    def __init__(self, inputs, num_input_nodes, num_reservoir_nodes, num_output_nodes, leak_rate=0.1, activator=np.tanh, scale_of_inputs=1.0):
-        self.inputs = inputs * scale_of_inputs
+    def __init__(self, inputs, num_input_nodes, num_reservoir_nodes, num_output_nodes, leak_rate=0.1, activator=np.tanh):
+        self.inputs = inputs
         self.reservoir_nodes = np.zeros(num_reservoir_nodes)
 
         self.outputs = np.array([])
@@ -76,8 +76,8 @@ class ReservoirNetWork:
     def get_current_output(self):
         return self.activator(self.reservoir_nodes @ self.weights_output)
     
-    def minimum_square_error(self, trained_data, desired_data):
-        return np.sqrt(np.sum((trained_data - desired_data) ** 2)) / len(trained_data)
+    def minimum_square_error(self, data_a, data_b):
+        return np.sqrt(np.sum((data_a - data_b) ** 2)) / len(data_a)
         
 
 
