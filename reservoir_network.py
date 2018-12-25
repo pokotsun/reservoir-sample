@@ -5,7 +5,6 @@ class ReservoirNetWork:
 
     def __init__(self, inputs, num_input_nodes, num_reservoir_nodes, num_output_nodes, leak_rate=0.1, activator=np.tanh):
         self.inputs = inputs
-        # self.reservoir_nodes = np.zeros(num_reservoir_nodes)
         self.internal_states = np.array([np.zeros(num_reservoir_nodes)])
 
         self.weights_input = self._generate_variational_weights(num_input_nodes, num_reservoir_nodes)
@@ -52,34 +51,25 @@ class ReservoirNetWork:
         return outputs
 
     def predict(self, length_of_sequence, lambda0=0.01):
-        predicted_outputs = np.array([self.inputs[-1]])
-
-        return predicted_outputs
-
-    # def predict(self, length_of_sequence, lambda0=0.1):
-    #     predicted_outputs = np.array([self.inputs[-1]])
-
-    #     for _ in range(length_of_sequence - 1):
-    #         last_output = predicted_outputs[-1]
-    #         self._update_reservoir_nodes(last_output)
-    #         # self._update_weights_output(last_output, lambda0)
-    #         predicted_output = self.get_current_output()
-    #         predicted_outputs = np.append(predicted_outputs, predicted_output)
-
-    #     return predicted_outputs
+        predicted_outputs = [self.inputs[-1]] # 最初にひとつ目だけ学習データの最後のデータを使う
+        reservoir_nodes = self.internal_states[-1] # 訓練の結果得た最後の内部状態を取得
+        for _ in range(length_of_sequence):
+            reservoir_nodes = self._get_next_reservoir_nodes(predicted_outputs[-1], reservoir_nodes)
+            predicted_outputs.append(self.get_output(reservoir_nodes))
+        return predicted_outputs[1:] # 最初に使用した学習データの最後のデータを外して返す
 
     # get output of current state
     def get_output(self, reservoir_nodes):
         return self.activator(reservoir_nodes @ self.weights_output)
-
-    def get_next_output(self):
-        return self.activator(self.internal_states[-1] @ self.weights_output)
     
     def minimum_square_error(self, data_a, data_b):
         return np.sqrt(np.sum((data_a - data_b) ** 2)) / len(data_a)
 
 
+    #############################
     ##### private method ########
+    #############################
+
     # create weights either -0.1 or +0.1
     def _generate_variational_weights(self, num_pre_nodes, num_post_nodes):
         return (np.random.randint(0, 2, num_pre_nodes * num_post_nodes).reshape([num_pre_nodes, num_post_nodes]) * 2 - 1) * 0.1
