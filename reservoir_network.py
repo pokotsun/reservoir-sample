@@ -64,7 +64,8 @@ class ReservoirNetWork:
 
     # get output of current state
     def get_output(self, reservoir_nodes):
-        return self.activator(reservoir_nodes @ self.weights_output)
+        #return self.activator(reservoir_nodes @ self.weights_output)
+        return reservoir_nodes @ self.weights_output
 
     #############################
     ##### private method ########
