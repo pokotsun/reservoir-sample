@@ -25,3 +25,18 @@ class InputGenerator:
             zdata.append(z)
         return np.array([xdata, ydata, zdata])
 
+    def generate_lorenz(self, p=10, r=28, b=8/3):
+        xdata = [0.1]
+        ydata = [0.1]
+        zdata = [0.1]
+        for t in np.arange(self.dt, self.end_time, self.dt):
+            (px, py, pz) = (xdata[-1], ydata[-1], zdata[-1])
+            x = px + self.dt * p * (py - px) 
+            y = py + self.dt * (px * (r - pz) - py)
+            z = pz + self.dt * (px * py - b * pz)
+            xdata.append(x)
+            ydata.append(y)
+            zdata.append(z)
+        return np.array([xdata, ydata, zdata])
+
+

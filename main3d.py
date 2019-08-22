@@ -4,10 +4,9 @@ from reservoir_network import ReservoirNetWork
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
     
-
-T = 100
+T = 20
 RATIO_TRAIN = 0.6
-dt = 0.05
+dt = 0.01
 AMPLITUDE = 0.9
 LEAK_RATE=0.06
 NUM_RESERVOIR_NODES = 300
@@ -18,7 +17,7 @@ def ReLU(x):
 
 def main():
     i_gen = InputGenerator(0, T, dt)
-    data = i_gen.generate_rossler()
+    data = i_gen.generate_lorenz()
 
     fig = plt.figure()
     ax = fig.add_subplot(111, projection='3d')
