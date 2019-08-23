@@ -7,8 +7,10 @@ T = 50
 RATIO_TRAIN = 0.6
 dt = 0.1 
 AMPLITUDE = 0.9
-LEAK_RATE=0.06
+LEAK_RATE=0.08
+NUM_INPUT_NODES = 1
 NUM_RESERVOIR_NODES = 300
+NUM_OUTPUT_NODES = 1
 
 # example of activator
 def ReLU(x):
@@ -16,14 +18,15 @@ def ReLU(x):
 
 def main():
     i_gen = InputGenerator(0, T, dt)
-    data = i_gen.generate_sin(amplitude=AMPLITUDE)
+    #data = i_gen.generate_sin(amplitude=AMPLITUDE)
+    data = i_gen.generate_mackey_glass()
     num_train = int(len(data) * RATIO_TRAIN)
     train_data = data[:num_train]
 
     model = ReservoirNetWork(inputs=train_data,
-        num_input_nodes=1, 
+        num_input_nodes=NUM_INPUT_NODES, 
         num_reservoir_nodes=NUM_RESERVOIR_NODES, 
-        num_output_nodes=1, 
+        num_output_nodes=NUM_OUTPUT_NODES, 
         leak_rate=LEAK_RATE)
 
     model.train() # 訓練
@@ -33,7 +36,7 @@ def main():
     predict_result = model.predict(num_predict)
     
     ## plot
-    plt.plot(np.arange(0, T * RATIO_TRAIN, dt), train_data, label="inputs")
+    plt.plot(np.arange(0, T, dt), data, label="inputs")
     plt.plot(np.arange(0, T * RATIO_TRAIN, dt), train_result, label="trained")
     plt.plot(np.arange(T * RATIO_TRAIN, T, dt), predict_result, label="predicted")
     plt.axvline(x=int(T * RATIO_TRAIN), label="end of train", color="green") # border of train and prediction
