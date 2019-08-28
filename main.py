@@ -3,13 +3,13 @@ from input_generator import InputGenerator
 from reservoir_network import ReservoirNetWork
 import matplotlib.pyplot as plt
 
-T = 50 
+T = 50
 RATIO_TRAIN = 0.6
-dt = 0.1 
+dt = 0.05
 AMPLITUDE = 0.9
-LEAK_RATE=0.07
+LEAK_RATE=0.03
 NUM_INPUT_NODES = 1
-NUM_RESERVOIR_NODES = 300
+NUM_RESERVOIR_NODES = 150
 NUM_OUTPUT_NODES = 1
 
 # example of activator
