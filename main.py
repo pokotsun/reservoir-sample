@@ -7,7 +7,7 @@ T = 50
 RATIO_TRAIN = 0.6
 dt = 0.1 
 AMPLITUDE = 0.9
-LEAK_RATE=0.08
+LEAK_RATE=0.07
 NUM_INPUT_NODES = 1
 NUM_RESERVOIR_NODES = 300
 NUM_OUTPUT_NODES = 1
@@ -18,8 +18,7 @@ def ReLU(x):
 
 def main():
     i_gen = InputGenerator(0, T, dt)
-    #data = i_gen.generate_sin(amplitude=AMPLITUDE)
-    data = i_gen.generate_mackey_glass()
+    data = i_gen.generate_sin(amplitude=AMPLITUDE)
     num_train = int(len(data) * RATIO_TRAIN)
     train_data = data[:num_train]
 

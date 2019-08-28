@@ -13,7 +13,7 @@ class InputGenerator:
         return np.sin(np.arange(self.start_time, self.end_time, self.dt)) * amplitude
 
     def generate_mackey_glass(self, a=0.2, b=1, c=0.9, d=17, e=10, initial=0.1):
-        return signalz.mackey_glass(self.num_time_steps, a=a, b=b, c=c, d=d, e=e, initial=initial) - 0.8
+        return (signalz.mackey_glass(self.num_time_steps+200, a=a, b=b, c=c, d=d, e=e, initial=initial) - 0.8)[200:]
 
     def generate_rossler(self, a=0.2, b=0.2, c=5.7):
         xdata = [0]
