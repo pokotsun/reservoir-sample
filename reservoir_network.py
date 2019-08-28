@@ -20,21 +20,6 @@ class ReservoirNetWork:
         self.leak_rate = leak_rate # 漏れ率
         self.activator = activator # 活性化関数
 
-    # reservoir層のノードの次の状態を取得
-    def _get_next_reservoir_nodes(self, input, current_state):
-        next_state = (1 - self.leak_rate) * current_state
-        next_state += self.leak_rate * (np.array([input]) @ self.weights_input
-            + current_state @ self.weights_reservoir)
-        return self.activator(next_state)
-
-    # 出力層の重みを更新
-    def _update_weights_output(self, lambda0):
-        # Ridge Regression
-        E_lambda0 = np.identity(self.num_reservoir_nodes) * lambda0 # lambda0
-        inv_x = np.linalg.inv(self.log_reservoir_nodes.T @ self.log_reservoir_nodes + E_lambda0)
-        # update weights of output layer
-        self.weights_output = (inv_x @ self.log_reservoir_nodes.T) @ self.inputs
-
     # 学習する
     def train(self, lambda0=0.1):
         for input in self.inputs:
@@ -71,6 +56,21 @@ class ReservoirNetWork:
     ##### private method ########
     #############################
 
+    # reservoir層のノードの次の状態を取得
+    def _get_next_reservoir_nodes(self, input, current_state):
+        next_state = (1 - self.leak_rate) * current_state
+        next_state += self.leak_rate * (np.array([input]) @ self.weights_input
+            + current_state @ self.weights_reservoir)
+        return self.activator(next_state)
+
+    # 出力層の重みを更新
+    def _update_weights_output(self, lambda0):
+        # Ridge Regression
+        E_lambda0 = np.identity(self.num_reservoir_nodes) * lambda0 # lambda0
+        inv_x = np.linalg.inv(self.log_reservoir_nodes.T @ self.log_reservoir_nodes + E_lambda0)
+        # update weights of output layer
+        self.weights_output = (inv_x @ self.log_reservoir_nodes.T) @ self.inputs
+
     # 重みを0.1か-0.1で初期化したものを返す
     def _generate_variational_weights(self, num_pre_nodes, num_post_nodes):
         return (np.random.randint(0, 2, num_pre_nodes * num_post_nodes).reshape([num_pre_nodes, num_post_nodes]) * 2 - 1) * 0.1
@@ -80,15 +80,3 @@ class ReservoirNetWork:
         weights = np.random.normal(0, 1, num_nodes * num_nodes).reshape([num_nodes, num_nodes])
         spectral_radius = max(abs(linalg.eigvals(weights)))
         return weights / spectral_radius
-        
-
-
-
-            
-
-
-
-
-    
-    
-
