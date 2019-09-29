@@ -3,21 +3,22 @@ from input_generator import InputGenerator
 from reservoir_network import ReservoirNetWork
 import matplotlib.pyplot as plt
 
-T = 50
+T = np.pi * 16 
 RATIO_TRAIN = 0.6
-dt = 0.05
+dt = np.pi * 0.01
 AMPLITUDE = 0.9
-LEAK_RATE=0.03
+LEAK_RATE=0.02
 NUM_INPUT_NODES = 1
 NUM_RESERVOIR_NODES = 150
 NUM_OUTPUT_NODES = 1
+NUM_TIME_STEPS = int(T/dt)
 
 # example of activator
 def ReLU(x):
     return np.maximum(0, x)
 
 def main():
-    i_gen = InputGenerator(0, T, dt)
+    i_gen = InputGenerator(0, T, NUM_TIME_STEPS)
     data = i_gen.generate_sin(amplitude=AMPLITUDE)
     num_train = int(len(data) * RATIO_TRAIN)
     train_data = data[:num_train]
@@ -31,13 +32,14 @@ def main():
     model.train() # 訓練
     train_result = model.get_train_result() # 訓練の結果を取得
     
-    num_predict = int(len(data) * (1 - RATIO_TRAIN))
+    num_predict = int(len(data[num_train:]))
     predict_result = model.predict(num_predict)
-    
+
+    t = np.linspace(0, T, NUM_TIME_STEPS)
     ## plot
-    plt.plot(np.arange(0, T, dt), data, label="inputs")
-    plt.plot(np.arange(0, T * RATIO_TRAIN, dt), train_result, label="trained")
-    plt.plot(np.arange(T * RATIO_TRAIN, T, dt), predict_result, label="predicted")
+    plt.plot(t, data, label="inputs")
+    plt.plot(t[:num_train], train_result, label="trained")
+    plt.plot(t[num_train:], predict_result, label="predicted")
     plt.axvline(x=int(T * RATIO_TRAIN), label="end of train", color="green") # border of train and prediction
     plt.legend()
     plt.title("Echo State Network Sin Prediction")
